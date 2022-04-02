@@ -1,8 +1,14 @@
-import React, {useRef, useState} from 'react';
+import React, {
+  PropsWithChildren,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Animated,
   Image,
   Platform,
+  Pressable,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -13,14 +19,69 @@ import {
 } from 'react-native';
 import {Data, data} from './data';
 
+type SpringPressableType = (param: {id: number}) => void;
+interface SpringPressableProps {
+  id: number;
+  onPress: SpringPressableType;
+}
+// spring animated pressable wrapper to wrap our card and pagination dots
+const SpringPressable = ({
+  id,
+  onPress = () => {},
+  children,
+}: PropsWithChildren<SpringPressableProps>) => {
+  const [isPressed, setIsPressed] = useState<boolean>(false);
+  const [animation] = useState(new Animated.Value(0));
+
+  const scale = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0.95],
+  });
+
+  const animatedStyle = {
+    transform: [{scale}],
+    backgroundColor: 'transparent',
+  };
+
+  const handleSpringAction = () => {
+    setIsPressed(active => !active);
+  };
+
+  const handlePress = () => {
+    onPress({id});
+  };
+
+  useLayoutEffect(() => {
+    Animated.spring(animation, {
+      toValue: isPressed ? 1 : 0,
+      useNativeDriver: true,
+      speed: 10,
+      bounciness: 10,
+    }).start();
+  }, [animation, isPressed]);
+
+  return (
+    <Animated.View style={animatedStyle}>
+      <Pressable
+        onPress={handlePress}
+        onPressIn={handleSpringAction}
+        onPressOut={handleSpringAction}>
+        {children}
+      </Pressable>
+    </Animated.View>
+  );
+};
+
 const PaginationDots = ({
   dots,
   activeDot,
   carouselXRef,
+  onPress,
 }: {
   dots: number;
   activeDot: number | null;
   carouselXRef: Animated.Value | Animated.AnimatedInterpolation;
+  onPress: SpringPressableType;
 }) => {
   const dotsMap = Array.from({length: dots}, (_, i) => i);
   const {width} = useWindowDimensions();
@@ -35,14 +96,16 @@ const PaginationDots = ({
         ];
         const scale: unknown = carouselXRef.interpolate({
           inputRange,
-          outputRange: [1, 1.5, 1],
+          outputRange: [1, 2, 1],
           extrapolate: 'clamp',
         });
         return (
-          <Animated.View
-            key={index}
-            style={styles({isActive, scale: scale as number}).dots}
-          />
+          <SpringPressable id={index} key={index} onPress={onPress}>
+            <Animated.View
+              key={index}
+              style={styles({isActive, scale: scale as number}).dots}
+            />
+          </SpringPressable>
         );
       })}
     </View>
