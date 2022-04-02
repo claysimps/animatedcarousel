@@ -1,115 +1,69 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
 import React from 'react';
 import {
+  FlatList,
+  Image,
+  Platform,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
 } from 'react-native';
+import {Data, data} from './data';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-const Section: React.FC<{
-  title: string;
-}> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+export const App = () => {
+  const renderItem = ({item, index}: {item: Data; index: number}) => (
+    <View style={shadow}>
+      <View style={styles.card} key={index}>
+        <Image style={styles.image} source={item.image} />
+        <Text style={styles.title}>{item.title}</Text>
+        <Text>{item.text}</Text>
+      </View>
     </View>
   );
-};
-
-const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+    <SafeAreaView style={styles.container}>
+      <StatusBar />
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item: Data) => `${item.id}`}
+      />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    backgroundColor: 'rgb(243,243,243)',
+    flex: 1,
+    marginTop: StatusBar.currentHeight || 0,
+    alignItems: 'center',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  card: {
+    width: 350,
+    height: 500,
+    borderRadius: 15,
+    overflow: 'hidden',
+    marginHorizontal: 20,
+    alignItems: 'center',
+    backgroundColor: 'white',
+    margin: 20,
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  shadow: {
+    shadowRadius: 13,
+    shadowOpacity: 0.5,
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
   },
-  highlight: {
-    fontWeight: '700',
+  image: {width: 350, height: 300},
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginVertical: 20,
   },
 });
 
-export default App;
+const shadow = Platform.OS === 'ios' ? styles.shadow : {elevation: 2};
