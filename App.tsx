@@ -11,6 +11,14 @@ import {
 } from 'react-native';
 import {Data, data} from './data';
 
+const PaginationDots = () => (
+  <View style={styles.dotContainer}>
+    <View style={styles.dots} />
+    <View style={styles.dots} />
+    <View style={styles.dots} />
+  </View>
+);
+
 export const App = () => {
   const renderItem = ({item, index}: {item: Data; index: number}) => (
     <View style={shadow}>
@@ -25,10 +33,15 @@ export const App = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar />
       <FlatList
+        showsHorizontalScrollIndicator={false}
+        horizontal
+        pagingEnabled
+        contentContainerStyle={styles.flatListContainer}
         data={data}
         renderItem={renderItem}
         keyExtractor={(item: Data) => `${item.id}`}
       />
+      <PaginationDots />
     </SafeAreaView>
   );
 };
@@ -63,6 +76,24 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginVertical: 20,
+  },
+  flatListContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+  },
+  dotContainer: {
+    flex: 1,
+    width: 250,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  dots: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginHorizontal: 10,
+    backgroundColor: 'rgb(0,0,0)',
   },
 });
 
