@@ -6,6 +6,7 @@ import React, {
 } from 'react';
 import {
   Animated,
+  FlatList,
   Image,
   Platform,
   Pressable,
@@ -90,13 +91,16 @@ const PaginationDots = ({
       {dotsMap.map((_, index) => {
         const isActive = index === activeDot;
         const inputRange = [
+          (index - 2) * width,
           (index - 1) * width,
           index * width,
+          index * width,
           (index + 1) * width,
+          (index + 2) * width,
         ];
         const scale: unknown = carouselXRef.interpolate({
           inputRange,
-          outputRange: [1, 2, 1],
+          outputRange: [1, 1.5, 2, 2, 1.5, 1],
           extrapolate: 'clamp',
         });
         return (
@@ -112,10 +116,21 @@ const PaginationDots = ({
   );
 };
 
+const renderItem = ({item, index}: {item: Data; index: number}) => (
+  <SpringPressable id={index} onPress={() => {}}>
+    <View style={shadow}>
+      <View style={styles({}).card} key={index}>
+        <Image style={styles({}).image} source={item.image} />
+        <Text style={styles({}).title}>{item.title}</Text>
+        <Text>{item.text}</Text>
+      </View>
+    </View>
+  </SpringPressable>
+);
+
 export const App = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
   const carouselXRef = useRef<Animated.Value>(new Animated.Value(0)).current;
-
   const viewConfigRef = useRef<{
     viewAreaCoveragePercentThreshold: number;
   }>({viewAreaCoveragePercentThreshold: 50});
@@ -125,21 +140,20 @@ export const App = () => {
   >(({viewableItems}) => {
     setActiveIndex(viewableItems[0]?.index);
   });
+  const scrollRef = useRef<FlatList>(null);
 
-  const renderItem = ({item, index}: {item: Data; index: number}) => (
-    <View style={shadow}>
-      <View style={styles({}).card} key={index}>
-        <Image style={styles({}).image} source={item.image} />
-        <Text style={styles({}).title}>{item.title}</Text>
-        <Text>{item.text}</Text>
-      </View>
-    </View>
-  );
+  const handleDotPress = ({id}: {id: number}) => {
+    scrollRef.current?.scrollToIndex({
+      index: id,
+      animated: true,
+    });
+  };
 
   return (
     <SafeAreaView style={styles({}).container}>
       <StatusBar />
       <Animated.FlatList
+        ref={scrollRef}
         viewabilityConfig={viewConfigRef.current}
         onScroll={Animated.event(
           [{nativeEvent: {contentOffset: {x: carouselXRef}}}],
@@ -155,6 +169,7 @@ export const App = () => {
         keyExtractor={(item: Data) => `${item.id}`}
       />
       <PaginationDots
+        onPress={handleDotPress}
         activeDot={activeIndex}
         dots={data.length}
         carouselXRef={carouselXRef}
