@@ -32,9 +32,9 @@ const SpringPressable = ({
   children,
 }: PropsWithChildren<SpringPressableProps>) => {
   const [isPressed, setIsPressed] = useState<boolean>(false);
-  const [animation] = useState(new Animated.Value(0));
+  const [animation] = useState<Animated.Value>(new Animated.Value(0));
 
-  const scale = animation.interpolate({
+  const scale: Animated.AnimatedInterpolation = animation.interpolate({
     inputRange: [0, 1],
     outputRange: [1, 0.95],
   });
