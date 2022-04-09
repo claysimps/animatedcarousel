@@ -22,12 +22,10 @@ const PaginationDots = ({
   activeDot: number | null;
   carouselXRef: Animated.Value | Animated.AnimatedInterpolation;
 }) => {
-  // Step 2 map dots
   const dotsMap = Array.from({length: dots}, (_, i) => i);
   const {width} = useWindowDimensions();
   return (
     <View style={styles({}).dotContainer}>
-      {/* step 3 map dots */}
       {dotsMap.map((_, index) => {
         // Do colour last
         const isActive = index === activeDot;
@@ -95,7 +93,6 @@ export const App = () => {
         keyExtractor={(item: Data) => `${item.id}`}
       />
       <PaginationDots
-        // step 1 add to component
         activeDot={activeIndex}
         dots={data.length}
         carouselXRef={carouselXRef}
